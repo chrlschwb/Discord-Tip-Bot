@@ -3,7 +3,7 @@ import { Command } from "../Command";
 import { setJoyData } from '../database/control';
 
 export const SetWallet: Command = {
-    name: "wallet",
+    name: "register",
     description: "Connect Wallet to discord user",
     options: [
         {
