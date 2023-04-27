@@ -21,7 +21,7 @@ export const Withdraw: Command = {
 
         const { user, options } = interaction;
 
-        const amount = await getJoyData(user.username);
+        const amount = await getJoyData(user.tag);
         const collageAmount = amount.collageAmount;
         const address = amount.walletAddress;
         const withdrawAmount = Number(options.get("amount")?.value);
@@ -32,7 +32,7 @@ export const Withdraw: Command = {
             const seed = process.env.SERVER_WALLET_KEY;
             const transfer = await transferBalance(seed!, address, withdrawAmount * 10000000000)
             if (transfer) {
-                const withdraw = await withdrawJoy(user.username, withdrawAmount);
+                const withdraw = await withdrawJoy(user.tag, withdrawAmount);
                 content = `${withdraw}`
             } else {
                 content = "Error : withdraw error"

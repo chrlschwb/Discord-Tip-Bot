@@ -11,7 +11,9 @@ export const GetAmount: Command = {
 
         const { user } = interaction;
 
-        const amount = await getJoyData(user.username);
+        const amount = await getJoyData(user.tag);
+
+        console.log(user.tag)
 
         const content = `Your JOY balance is ${amount.collageAmount}`;
 

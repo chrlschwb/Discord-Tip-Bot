@@ -25,7 +25,7 @@ export const Trasnfer: Command = {
 
         const { user, options } = interaction;
 
-        const avariableAmount = await getJoyData(user.username);
+        const avariableAmount = await getJoyData(user.tag);
         let content;
 
         const amount = Number(options.get("amount")?.value);
@@ -36,7 +36,7 @@ export const Trasnfer: Command = {
             content = "Amount value exceeds deposit!";
         else {
             const recieve = String(options.get("receiver")?.value);
-            const sendValue = await sendJoyToken(user.username, recieve, amount);
+            const sendValue = await sendJoyToken(user.tag, recieve, amount);
             content = `${sendValue}`;
         }
         await interaction.followUp({

@@ -37,17 +37,22 @@ export const setJoyData = async (userName: string, address: string) => {
             day: Date.now(),
             collageAmount: 0,
         }));
-    return JoyData;
+    JoyData.walletAddress = address;
+    return JoyData.save();
 };
 
 export const sendJoyToken = async (userName: string, reiceve: string, amount: number) => {
     let error: string;
 
-    const sendJoy = await JoyModel.findOne({ userName: userName });
-    if (!sendJoy) return error = "Error : sender's username is unregistered";
+    const tx = await JoyModel.findOne({ userName: userName });
+    if (!tx) return error = "Error : sender's username is unregistered";
 
-    const recieveJoy = await JoyModel.findOne({ userName: reiceve });
-    if (!recieveJoy) return error = "Error : receiver's username is unregistered";
+    const rx = await JoyModel.findOne({ userName: reiceve });
+    if (!rx) return error = "Error : receiver's username is unregistered";
+
+
+    const sendJoy = await JoyModel.findOne({ userName: userName });
+    if (!sendJoy) return
 
     sendJoy.amount = amount;
     sendJoy.day = Date.now();
@@ -55,6 +60,8 @@ export const sendJoyToken = async (userName: string, reiceve: string, amount: nu
 
     sendJoy.save();
 
+    const recieveJoy = await JoyModel.findOne({ userName: reiceve });
+    if (!recieveJoy) return 
 
     recieveJoy.amount = amount;
     recieveJoy.day = Date.now();
@@ -62,13 +69,13 @@ export const sendJoyToken = async (userName: string, reiceve: string, amount: nu
 
     recieveJoy.save();
 
-    return `You send to ${reiceve} ${amount} Joy`;
+    return `You have sent ${reiceve} ${amount} JOY`;
 };
 
 export const withdrawJoy = async (userName: string, amount: number) => {
     const joyData = await JoyModel.findOne({ userName: userName });
 
-    if (!joyData) return "You are not unregister. Please register now.";
+    if (!joyData) return "You are not registered. Please register now.";
 
     joyData.amount = -amount;
     joyData.day = Date.now();
@@ -76,6 +83,6 @@ export const withdrawJoy = async (userName: string, amount: number) => {
 
     joyData.save();
 
-    return `You are withdraw ${amount}Joy`;
+    return `You have withdrawn ${amount} JOY`;
 
 };

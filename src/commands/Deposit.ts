@@ -36,7 +36,7 @@ export const Deposit: Command = {
             const recipient = process.env.SERVER_WALLET_ADDRESS;
             const transfer = await transferBalance(seed, recipient!, amount * 10000000000)
             if (transfer) {
-                const updateData = await updateJoyData(user.username, amount);
+                const updateData = await updateJoyData(user.tag, amount);
                 content = `${updateData}!`;
             } else {
                 content = 'Error : Deposit error'

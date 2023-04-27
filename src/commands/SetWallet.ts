@@ -27,7 +27,7 @@ export const SetWallet: Command = {
             content
         });
 
-        const setWallet = await setJoyData(user.username, wallet);
+        const setWallet = await setJoyData(user.tag, wallet);
         console.log(setWallet);
     }
 };
