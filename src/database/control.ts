@@ -41,35 +41,28 @@ export const setJoyData = async (userName: string, address: string) => {
     return JoyData.save();
 };
 
-export const sendJoyToken = async (userName: string, reiceve: string, amount: number) => {
+export const sendJoyToken = async (userName: string, receiver: string, amount: number) => {
     let error: string;
 
     const tx = await JoyModel.findOne({ userName: userName });
     if (!tx) return error = "Error : sender's username is unregistered";
 
-    const rx = await JoyModel.findOne({ userName: reiceve });
+    const rx = await JoyModel.findOne({ userName: receiver });
     if (!rx) return error = "Error : receiver's username is unregistered";
 
+    tx.amount = amount;
+    tx.day = Date.now();
+    tx.collageAmount -= amount;
 
-    const sendJoy = await JoyModel.findOne({ userName: userName });
-    if (!sendJoy) return
+    tx.save();
 
-    sendJoy.amount = amount;
-    sendJoy.day = Date.now();
-    sendJoy.collageAmount -= amount;
+    rx.amount = amount;
+    rx.day = Date.now();
+    rx.collageAmount += amount
 
-    sendJoy.save();
+    rx.save();
 
-    const recieveJoy = await JoyModel.findOne({ userName: reiceve });
-    if (!recieveJoy) return 
-
-    recieveJoy.amount = amount;
-    recieveJoy.day = Date.now();
-    recieveJoy.collageAmount += amount
-
-    recieveJoy.save();
-
-    return `You have sent ${reiceve} ${amount} JOY`;
+    return `You have sent ${receiver} ${amount} JOY`;
 };
 
 export const withdrawJoy = async (userName: string, amount: number) => {

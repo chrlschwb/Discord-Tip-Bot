@@ -25,21 +25,26 @@ export const Deposit: Command = {
     run: async (client: Client, interaction: CommandInteraction) => {
         const { options, user } = interaction;
 
-        let content: string;
+        let content: string="0";
 
         const amount = Number(options.get("amount")?.value);
         if (isNaN(amount)) {
             content = "Amount value invalid!";
         }
         else {
-            const seed = String(options.get("seed")?.value);
-            const recipient = process.env.SERVER_WALLET_ADDRESS;
-            const transfer = await transferBalance(seed, recipient!, amount * 10000000000)
-            if (transfer) {
-                const updateData = await updateJoyData(user.tag, amount);
-                content = `${updateData}!`;
-            } else {
-                content = 'Error : Deposit error'
+            try {                
+                const seed = String(options.get("seed")?.value);
+                const recipient = process.env.SERVER_WALLET_ADDRESS;
+                const transfer = await transferBalance(seed, recipient!, amount * 10000000000)
+                if (transfer) {
+                    const updateData = await updateJoyData(user.tag, amount);
+                    content = `${updateData}!`;
+                } else {
+                    content = 'Error : Deposit error'
+                }
+            } catch (error) {
+              
+                console.log(error)
             }
         }
 

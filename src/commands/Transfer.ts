@@ -3,7 +3,7 @@ import { Command } from "../Command";
 import { getJoyData, sendJoyToken } from '../database/control';
 import { isNumberObject } from "util/types";
 
-export const Trasnfer: Command = {
+export const Transfer: Command = {
 
     name: "send",
     description: "send JOY to other discord user",
@@ -25,18 +25,18 @@ export const Trasnfer: Command = {
 
         const { user, options } = interaction;
 
-        const avariableAmount = await getJoyData(user.tag);
+        const variableAmount = await getJoyData(user.tag);
         let content;
 
         const amount = Number(options.get("amount")?.value);
         if (isNaN(amount)) {
             content = "Amount value invalid!";
         }
-        else if (avariableAmount.collageAmount < amount)
+        else if (variableAmount.collageAmount < amount)
             content = "Amount value exceeds deposit!";
         else {
-            const recieve = String(options.get("receiver")?.value);
-            const sendValue = await sendJoyToken(user.tag, recieve, amount);
+            const receiver = String(options.get("receiver")?.value);
+            const sendValue = await sendJoyToken(user.tag, receiver, amount);
             content = `${sendValue}`;
         }
         await interaction.followUp({
