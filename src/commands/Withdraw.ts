@@ -30,7 +30,7 @@ export const Withdraw: Command = {
             content = "Error : Your deposit is less then withdraw amount."
         } else {
             const seed = process.env.SERVER_WALLET_KEY;
-            const transfer = await transferBalance(seed!, address, withdrawAmount * 10000000000)
+            const transfer = await transferBalance(seed!, address, withdrawAmount * 10000000000 - 100000000)
             if (transfer) {
                 const withdraw = await withdrawJoy(user.tag, withdrawAmount);
                 content = `${withdraw}`

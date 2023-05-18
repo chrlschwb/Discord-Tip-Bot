@@ -10,7 +10,7 @@ export async function transferBalance(sendKey: string, recipient: string, amount
 
     const sender = keyring.addFromUri(sendKey);
 
-    const transfer = api.tx.balances.transfer(recipient, amount);
+    const transfer = api.tx.balances.transferKeepAlive(recipient, amount);
 
     try {
         await transfer.signAndSend(sender, ({ events = [], status }) => {
