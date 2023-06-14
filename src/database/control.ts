@@ -1,88 +1,87 @@
 import JoyModel from "./models";
 
 export const getJoyData = async (username: string) => {
-    const JoyData =
-        (await JoyModel.findOne({ userName: username })) ||
-        (await JoyModel.create({
-            userName: username,
-            walletAddress: 0,
-            amount: 0,
-            day: Date.now(),
-            collageAmount: 0,
-        }));
+  const JoyData =
+    (await JoyModel.findOne({ userName: username })) ||
+    (await JoyModel.create({
+      userName: username,
+      walletAddress: 0,
+      amount: 0,
+      day: 0,
+      collageAmount: 0,
+    }));
 
-    return JoyData;
+  return JoyData;
 };
 
 export const updateJoyData = async (userName: string, amount: number) => {
-    const joyData = await JoyModel.findOne({ userName: userName });
-    if (!joyData) return "You are not registered. Please register now.";
+  const joyData = await JoyModel.findOne({ userName: userName });
+  if (!joyData) return "You are not registered. Please register now.";
 
-    joyData.amount = amount;
-    joyData.day = Date.now();
-    joyData.collageAmount ? joyData.collageAmount += amount : joyData.collageAmount = amount;
+  joyData.amount = amount;
+  joyData.day = Date.now().toString();
+  joyData.collageAmount
+    ? (joyData.collageAmount += amount)
+    : (joyData.collageAmount = amount);
 
-    joyData.save();
-    return `Your deposit is ${amount} JOY`;
-
+  joyData.save();
+  return `Your deposit is ${amount} JOY`;
 };
 
 export const setJoyData = async (userName: string, address: string) => {
-    const JoyData =
-        (await JoyModel.findOne({ userName: userName })) ||
-        (await JoyModel.create({
-            userName: userName,
-            walletAddress: address,
-            amount: 0,
-            day: Date.now(),
-            collageAmount: 0,
-        }));
-    JoyData.walletAddress = address;
-    return JoyData.save();
+  const JoyData =
+    (await JoyModel.findOne({ userName: userName })) ||
+    (await JoyModel.create({
+      userName: userName,
+      walletAddress: address,
+      amount: 0,
+      collageAmount: 0,
+    }));
+  JoyData.walletAddress = address;
+  return JoyData.save();
 };
 
-export const sendJoyToken = async (userName: string, reiceve: string, amount: number) => {
-    let error: string;
+export const sendJoyToken = async (
+  userName: string,
+  reiceve: string,
+  amount: number
+) => {
+  let error: string;
 
-    const tx = await JoyModel.findOne({ userName: userName });
-    if (!tx) return error = "Error : sender's username is unregistered";
+  const tx = await JoyModel.findOne({ userName: userName });
+  if (!tx) return (error = "Error : sender's username is unregistered");
 
-    const rx = await JoyModel.findOne({ userName: reiceve });
-    if (!rx) return error = "Error : receiver's username is unregistered";
+  const rx = await JoyModel.findOne({ userName: reiceve });
+  if (!rx) return (error = "Error : receiver's username is unregistered");
 
+  const sendJoy = await JoyModel.findOne({ userName: userName });
+  if (!sendJoy) return;
 
-    const sendJoy = await JoyModel.findOne({ userName: userName });
-    if (!sendJoy) return
+  sendJoy.amount = amount;
+  sendJoy.collageAmount -= amount;
 
-    sendJoy.amount = amount;
-    sendJoy.day = Date.now();
-    sendJoy.collageAmount -= amount;
+  sendJoy.save();
 
-    sendJoy.save();
+  const recieveJoy = await JoyModel.findOne({ userName: reiceve });
+  if (!recieveJoy) return;
 
-    const recieveJoy = await JoyModel.findOne({ userName: reiceve });
-    if (!recieveJoy) return 
+  recieveJoy.amount = amount;
+  recieveJoy.collageAmount += amount;
 
-    recieveJoy.amount = amount;
-    recieveJoy.day = Date.now();
-    recieveJoy.collageAmount += amount
+  recieveJoy.save();
 
-    recieveJoy.save();
-
-    return `You have sent ${reiceve} ${amount} JOY`;
+  return `You have sent ${reiceve} ${amount} JOY`;
 };
 
 export const withdrawJoy = async (userName: string, amount: number) => {
-    const joyData = await JoyModel.findOne({ userName: userName });
+  const joyData = await JoyModel.findOne({ userName: userName });
 
-    if (!joyData) return "You are not registered. Please register now.";
+  if (!joyData) return "You are not registered. Please register now.";
 
-    joyData.amount = -amount;
-    joyData.day = Date.now();
-    joyData.collageAmount -= amount;
+  joyData.amount = -amount;
+  joyData.collageAmount -= amount;
 
-    joyData.save();
+  joyData.save();
 
-    return `You have withdrawn ${amount} JOY`;
-
+  return `You have withdrawn ${amount} JOY`;
 };
