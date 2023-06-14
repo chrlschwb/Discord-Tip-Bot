@@ -1,18 +1,19 @@
 import {
   CommandInteraction,
   Client,
-  ApplicationCommandOptionData,
   ApplicationCommandOptionType,
 } from "discord.js";
 import { Command } from "../Command";
-import { getJoyData, updateJoyData } from "../database/control";
-import { transferBalance } from "../transaction/transferJoy";
-import { decodeAddress, encodeAddress } from "../hook/formatAddress";
-import {
-  asExtrinsic,
-  getExtrinsics,
-  useGetTransfers,
-} from "../query/generator/extrinsics";
+import { getJoyData, setJoyData, updateJoyData } from "../database/control";
+import { useGetTransfers } from "../query/generator/extrinsics";
+import { createHash } from "crypto";
+
+function generateKeyFromSeed(seedWord: string): string {
+  const hash = createHash("sha256");
+  hash.update(seedWord);
+  const digest = hash.digest("hex");
+  return digest;
+}
 
 export const Deposit: Command = {
   name: "deposit",
@@ -35,13 +36,20 @@ export const Deposit: Command = {
   run: async (client: Client, interaction: CommandInteraction) => {
     const { options, user } = interaction;
 
-    let content: string = "test";
+    let content: string = "";
 
     const wallet = String(options.get("wallet")?.value);
+    const mnemonic = String(options.get("seed")?.value);
 
-    if (wallet) {
+    const key = generateKeyFromSeed(mnemonic);
+
+    const claimState = await setJoyData(user.tag, wallet, key);
+    if (claimState) {
+      content = "Your wallet is already verify";
       const dbdata = await getJoyData(user.tag);
+
       const date = new Date(dbdata.day);
+
       const filter = {
         call: {
           name_eq: "Balances.transfer",
@@ -50,29 +58,25 @@ export const Deposit: Command = {
           },
         },
       };
-      const extrinsics = await useGetTransfers(filter, wallet);
-      const amount = extrinsics.reduce(
-        (a: number, b) => (a += Number(b.value)),
-        0
-      );
-      const updateData = await updateJoyData(user.tag, amount / 10000000000);
-      content = updateData;
-      console.log(extrinsics, amount / 10000000000);
-    }
-    // if (isNaN(amount)) {
-    //     content = "Amount value invalid!";
-    // }
-    // else {
-    //     const seed = String(options.get("seed")?.value);
-    //     const recipient = process.env.SERVER_WALLET_ADDRESS;
-    //     const transfer = await transferBalance(seed, recipient!, amount * 10000000000)
-    //     if (transfer) {
-    //         content = `${updateData}!`;
-    //     } else {
-    //         content = 'Error : Deposit error'
-    //     }
-    // }
 
+      const extrinsics = await useGetTransfers(filter, wallet);
+      if (extrinsics.length !== 0) {
+        const amount = extrinsics.reduce(
+          (a: number, b) => (a += Number(b.value)),
+          0
+        );
+        const updateData = await updateJoyData(
+          user.tag,
+          amount / 10000000000,
+          wallet
+        );
+        content = updateData;
+      } else {
+        content = "You have don't amount";
+      }
+    } else {
+      content = key;
+    }
     await interaction.followUp({
       ephemeral: true,
       content,

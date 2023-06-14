@@ -1,11 +1,13 @@
 import { model, Schema } from "mongoose";
 
 export interface JoyBotData {
-  userName: String;
+  userName: string;
   walletAddress: string;
   amount: number;
   day: string;
   collageAmount: number;
+  challenge: string;
+  challengeAddress: string;
 }
 
 export const Joybot = new Schema({
@@ -14,6 +16,8 @@ export const Joybot = new Schema({
   amount: Number,
   day: Number,
   collageAmount: Number,
+  challenge: String,
+  challengeAddress: String,
 });
 
 export default model<JoyBotData>("joybot", Joybot);

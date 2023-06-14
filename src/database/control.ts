@@ -14,7 +14,11 @@ export const getJoyData = async (username: string) => {
   return JoyData;
 };
 
-export const updateJoyData = async (userName: string, amount: number) => {
+export const updateJoyData = async (
+  userName: string,
+  amount: number,
+  wallet: string
+) => {
   const joyData = await JoyModel.findOne({ userName: userName });
   if (!joyData) return "You are not registered. Please register now.";
 
@@ -23,22 +27,43 @@ export const updateJoyData = async (userName: string, amount: number) => {
   joyData.collageAmount
     ? (joyData.collageAmount += amount)
     : (joyData.collageAmount = amount);
+  joyData.walletAddress = wallet;
 
   joyData.save();
+
   return `Your deposit is ${amount} JOY`;
 };
 
-export const setJoyData = async (userName: string, address: string) => {
-  const JoyData =
-    (await JoyModel.findOne({ userName: userName })) ||
-    (await JoyModel.create({
+export const setJoyData = async (
+  userName: string,
+  address: string,
+  challenge: string
+) => {
+  const JoyData = await JoyModel.findOne({ userName: userName });
+
+  if (!JoyData) {
+    await JoyModel.create({
       userName: userName,
-      walletAddress: address,
+      walletAddress: 0,
       amount: 0,
+      day: 0,
       collageAmount: 0,
-    }));
-  JoyData.walletAddress = address;
-  return JoyData.save();
+      challenge: challenge,
+      challengeAddress: address,
+    });
+  } else {
+    if (JoyData.userName === userName && JoyData.walletAddress === address) {
+      return true;
+    }
+    if (JoyData) {
+      JoyData.challenge = challenge;
+      JoyData.challengeAddress = address;
+    }
+  }
+
+  JoyData?.save();
+
+  return false;
 };
 
 export const sendJoyToken = async (
@@ -84,4 +109,26 @@ export const withdrawJoy = async (userName: string, amount: number) => {
   joyData.save();
 
   return `You have withdrawn ${amount} JOY`;
+};
+
+export interface Challenge {
+  name?: string;
+  wallet?: string;
+  challenge?: string;
+}
+
+export const getChallengeData = async (
+  username: string
+): Promise<Challenge | Boolean> => {
+  const JoyData = await JoyModel.findOne({ userName: username });
+  if (!JoyData) {
+    return false;
+  }
+  const val: Challenge = {
+    challenge: JoyData?.challenge,
+    name: JoyData?.userName,
+    wallet: JoyData?.challengeAddress,
+  };
+
+  return val;
 };
