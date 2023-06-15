@@ -7,7 +7,7 @@ export const getJoyData = async (username: string) => {
       userName: username,
       walletAddress: 0,
       amount: 0,
-      day: 0,
+      day: 1684120215,
       collageAmount: 0,
     }));
 
@@ -46,7 +46,7 @@ export const setJoyData = async (
       userName: userName,
       walletAddress: 0,
       amount: 0,
-      day: 0,
+      day: 1684120215,
       collageAmount: 0,
       challenge: challenge,
       challengeAddress: address,

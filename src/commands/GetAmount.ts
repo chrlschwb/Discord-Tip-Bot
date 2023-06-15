@@ -3,13 +3,13 @@ import { Command } from "../Command";
 import { getJoyData } from "../database/control";
 
 export const GetAmount: Command = {
-  name: "get_balance",
-  description: "get JOY balance in discord",
+  name: "getbalance",
+  description: "get your JOY balance in the discord pool",
 
   run: async (client: Client, interaction: CommandInteraction) => {
     const { user } = interaction;
 
-    const amount = await getJoyData(user.tag);
+    const amount = await getJoyData(user.id);
 
     const content = `Your JOY balance is ${amount.collageAmount}`;
 

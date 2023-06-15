@@ -13,14 +13,14 @@ import {
 import { ClaimVerify, transferChallenge } from "../utils/signAndVerify";
 import { useGetTransfers } from "../query/generator/extrinsics";
 
-export const ConfirmWallet: Command = {
-  name: "confirm",
-  description: "challenge charactors confirm",
+export const Deposit2: Command = {
+  name: "verifydeposit2",
+  description:
+    "confirm you are the owner of the deposit by running this command after deposit-1",
   options: [
     {
-      name: "challenge",
-      description:
-        "Signed challenge must be exactly 130 symbols. You sent a string with symbols",
+      name: "signature",
+      description: "signature of the deposit account",
       type: ApplicationCommandOptionType.String,
       required: true,
     },
@@ -29,13 +29,13 @@ export const ConfirmWallet: Command = {
   run: async (client: Client, interaction: CommandInteraction) => {
     const { user, options } = interaction;
 
-    const decChallenge: string = String(options.get("challenge")?.value);
+    const decChallenge: string = String(options.get("signature")?.value);
     let content: string = "";
 
-    const claimm = await getChallengeData(user.tag);
+    const claimm = await getChallengeData(user.id);
 
     if (!claimm) {
-      content = "Your confirm is faild";
+      content = "You must run verifyDeposit-1 first";
     } else {
       const { challenge, name, wallet } = claimm as Challenge;
 
@@ -46,9 +46,9 @@ export const ConfirmWallet: Command = {
           wallet: wallet,
         };
         const confirm = await transferChallenge(verify);
-
+        console.log(verify);
         if (confirm) {
-          const dbdata = await getJoyData(user.tag);
+          const dbdata = await getJoyData(user.id);
           const date = new Date(dbdata.day);
           const filter = {
             call: {
@@ -67,17 +67,17 @@ export const ConfirmWallet: Command = {
             );
 
             const updateData = await updateJoyData(
-              user.tag,
+              user.id,
               amount / 10000000000,
               wallet
             );
 
             content = updateData;
           } else {
-            content = "You have error";
+            content = "There is no deposit from the given address";
           }
         } else {
-          content = "Your verify key is faild";
+          content = "Your signature is incorrect";
         }
       }
     }
