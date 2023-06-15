@@ -108,7 +108,7 @@ export const withdrawJoy = async (userName: string, amount: number) => {
 
   joyData.save();
 
-  return `You have withdrawn ${amount} JOY`;
+  return `You have withdrawn ${amount - 0.01} JOY`;
 };
 
 export interface Challenge {

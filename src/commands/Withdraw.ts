@@ -39,7 +39,7 @@ export const Withdraw: Command = {
         withdrawAmount * 10000000000
       );
       if (transfer) {
-        const withdraw = await withdrawJoy(user.id, withdrawAmount);
+        const withdraw = await withdrawJoy(user.id, withdrawAmount + 0.01);
         content = `${withdraw}`;
       } else {
         content = "Error : transaction error";
